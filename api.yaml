@@ -430,6 +430,109 @@ paths:
           description: "Invalid username supplied"
         404:
           description: "User not found"
+  /newsBlog/availableBlogs:
+    get:
+      tags:
+        - "newsBlog"
+      summary: "Get list of available news blogs"
+      description: ""
+      operationId: "getAvailableBlogs"
+      parameters: []
+      responses:
+        200:
+          description: "successful operation"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NewsBlogList'
+  /newsBlog/subscribedBlogs/{username}:
+    get:
+      tags:
+        - "newsBlog"
+      summary: "Get list of subscribed news blogs"
+      description: ""
+      operationId: "getSubscribedBlogs"
+      parameters:
+        - name: "username"
+          in: "path"
+          schema:
+            type: "string"
+          description: "The username of the account you want info of"
+          required: true
+          example: "max_mustermann"
+      responses:
+        200:
+          description: "successful operation"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NewsBlogList'
+        400:
+          description: "Invalid username supplied"
+        404:
+          description: "User not found"
+    
+  /newsBlog/subscription/{username}/{blogId}:
+    put:
+      tags:
+        - "newsBlog"
+      summary: "put given Blog to list of subscribed news blogs"
+      description: ""
+      operationId: "subscribeBlog"
+      parameters:
+        - name: "username"
+          in: "path"
+          schema:
+            type: "string"
+          description: "The username of the account you want to subscribe"
+          required: true
+          example: "max_mustermann"
+        - name: "blogId"
+          in: "path"
+          schema:
+            type: integer
+            format: int64
+          description: "The id of the news blog you want to subscribe"
+          required: true
+          example: 5
+      responses:
+        200:
+          description: "Subscription successfully added"
+        400:
+          description: "Invalid username or blogId supplied"
+        404:
+          description: "User or NewsBlog not found"
+    delete:
+      tags:
+        - "newsBlog"
+      summary: "delete given Blog from list of subscribed news blogs"
+      description: ""
+      operationId: "unsubscribeBlog"
+      parameters:
+        - name: "username"
+          in: "path"
+          schema:
+            type: "string"
+          description: "The username of the account you want to unsubscribe"
+          required: true
+          example: "max_mustermann"
+        - name: "blogId"
+          in: "path"
+          schema:
+            type: integer
+            format: int64
+          description: "The id of the news blog you want to unsubscribe"
+          required: true
+          example: 5
+      responses:
+        200:
+          description: "Subscription successfully deleted"
+        400:
+          description: "Invalid username or blogId supplied"
+        404:
+          description: "User or NewsBlog not found"
+
+  
 components:
   requestBodies:
     LoginCredentials:
@@ -534,6 +637,18 @@ components:
           type: string
         author:
           type: string
+      example: 
+        id: 1
+        name: zusammengebaut
+        url: https://zusammengebaut.com/
+        author: mehrere
+    NewsBlogList:
+     type: object
+     properties:
+        newsBlogs:
+          type: array
+          items:
+            $ref: '#/components/schemas/NewsBlog'
     ApiResponse:
       type: object
       properties:
