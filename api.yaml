@@ -18,8 +18,8 @@ tags:
     description: "Everything about blueprints, aka Mocs and Sets"
   - name: "newsBlog"
     description: "Everything about newsBlog"
-  - name: "user"
-    description: "Operations about user"
+  - name: "account"
+    description: "Operations about user accounts"
 schemes:
   - "https"
   - "http"
@@ -37,7 +37,7 @@ paths:
           description: "Pet object that needs to be added to the store"
           required: true
           schema:
-            $ref: "#/definitions/Pet"
+            $ref: "#/components/schemas/Pet"
       responses:
         400:
           description: "Invalid ID supplied"
@@ -79,7 +79,7 @@ paths:
           schema:
             type: "array"
             items:
-              $ref: "#/definitions/Pet"
+              $ref: "#/components/schemas/Pet"
         400:
           description: "Invalid status value"
       security:
@@ -111,7 +111,7 @@ paths:
           schema:
             type: "array"
             items:
-              $ref: "#/definitions/Pet"
+              $ref: "#/components/schemas/Pet"
         400:
           description: "Invalid tag value"
       security:
@@ -140,7 +140,7 @@ paths:
         200:
           description: "successful operation"
           schema:
-            $ref: "#/definitions/Pet"
+            $ref: "#/components/schemas/Pet"
         400:
           description: "Invalid ID supplied"
         404:
@@ -243,7 +243,7 @@ paths:
         200:
           description: "successful operation"
           schema:
-            $ref: "#/definitions/ApiResponse"
+            $ref: "#/components/schemas/ApiResponse"
       security:
         - petstore_auth:
             - "write:pets"
@@ -284,12 +284,12 @@ paths:
           description: "order placed for purchasing the pet"
           required: true
           schema:
-            $ref: "#/definitions/Order"
+            $ref: "#/components/schemas/Order"
       responses:
         200:
           description: "successful operation"
           schema:
-            $ref: "#/definitions/Order"
+            $ref: "#/components/schemas/Order"
         400:
           description: "Invalid Order"
   /store/order/{orderId}:
@@ -315,7 +315,7 @@ paths:
         200:
           description: "successful operation"
           schema:
-            $ref: "#/definitions/Order"
+            $ref: "#/components/schemas/Order"
         400:
           description: "Invalid ID supplied"
         404:
@@ -342,7 +342,7 @@ paths:
           description: "Invalid ID supplied"
         404:
           description: "Order not found"
-  /account:
+  /account/login:
     post:
       tags:
         - "account"
@@ -356,127 +356,76 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/definitions/ResponseToken"
-  /user/login:
-    get:
-      tags:
-        - "user"
-      summary: "Logs user into the system"
-      description: ""
-      operationId: "loginUser"
-      produces:
-        - "application/xml"
-        - "application/json"
-      parameters:
-        - name: "username"
-          in: "query"
-          description: "The user name for login"
-          required: true
-          type: "string"
-        - name: "password"
-          in: "query"
-          description: "The password for login in clear text"
-          required: true
-          type: "string"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            type: "string"
+                $ref: "#/components/schemas/AuthenticationResponse"
           headers:
             X-Rate-Limit:
-              type: "integer"
-              format: "int32"
+              schema:
+                type: integer
               description: "calls per hour allowed by the user"
             X-Expires-After:
-              type: "string"
-              format: "date-time"
+              schema:
+                type: integer
               description: "date in UTC when token expires"
-        400:
+        401:
           description: "Invalid username/password supplied"
-  /user/logout:
-    get:
+  /account/logout:
+    post:
+      security:
+        - bearerAuth: []
       tags:
-        - "user"
+        - "account"
       summary: "Logs out current logged in user session"
       description: ""
       operationId: "logoutUser"
-      produces:
-        - "application/xml"
-        - "application/json"
       parameters: []
       responses:
-        default:
+        200:
           description: "successful operation"
-  /user/{username}:
+  /account/{username}:
     get:
       security:
         - bearerAuth: []
       tags:
-        - "user"
-      summary: "Get user by user name"
+        - "account"
+      summary: "Get account info for logged in user"
       description: ""
-      operationId: "getUserByName"
-      produces:
-        - "application/xml"
-        - "application/json"
+      operationId: "getAccountByUsername"
       parameters:
         - name: "username"
           in: "path"
-          description: "The name that needs to be fetched. Use user1 for testing. "
+          schema:
+            type: "string"
+          description: "The username of the account you want info of"
           required: true
-          type: "string"
       responses:
         200:
           description: "successful operation"
-          schema:
-            $ref: "#/definitions/User"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Account"
         400:
           description: "Invalid username supplied"
         404:
           description: "User not found"
-    put:
-      tags:
-        - "user"
-      summary: "Updated user"
-      description: "This can only be done by the logged in user."
-      operationId: "updateUser"
-      produces:
-        - "application/xml"
-        - "application/json"
-      parameters:
-        - name: "username"
-          in: "path"
-          description: "name that need to be updated"
-          required: true
-          type: "string"
-        - in: "body"
-          name: "body"
-          description: "Updated user object"
-          required: true
-          schema:
-            $ref: "#/definitions/User"
-      responses:
-        400:
-          description: "Invalid user supplied"
-        404:
-          description: "User not found"
     delete:
+      security:
+        - bearerAuth: []
       tags:
-        - "user"
+        - "account"
       summary: "Delete user"
       description: "This can only be done by the logged in user."
       operationId: "deleteUser"
-      produces:
-        - "application/xml"
-        - "application/json"
       parameters:
         - name: "username"
-          in: "path"
-          description: "The name that needs to be deleted"
+          in: path
+          schema:
+            type: string
+          description: "The username of the account that needs to be deleted (can only be own)"
           required: true
-          type: "string"
       responses:
+        200:
+          description: "User successfully deleted"
         400:
           description: "Invalid username supplied"
         404:
@@ -493,102 +442,113 @@ components:
           example:
             username: "Dönermann"
             password: "Kebab"
+            privacy-policy-accepted: true
   schemas:
     LoginScheme:
       type: object
+      required:
+        - username
+        - password
+        - privacy-policy-accepted
       properties:
         username:
-          type: "string"
+          type: string
+          description: "The username on rebrickable"
         password:
+          type: string
+          description: "The password on rebrickable"
+        privacy-policy-accepted:
+          type: boolean
+          description: "Privacy Poliy needs to be accepted on login"
+    Account:
+      type: object
+      properties:
+        username:
+          type: string
+    AuthenticationResponse:
+      type: object
+      properties:
+        app_token:
           type: "string"
+          example: "32okdwkdwkoa2"
+        account_info:
+          $ref: '#/components/schemas/Account'
+    Part:
+      type: "object"
+      properties:
+        partNumber:
+          type: integer
+          format: int32
+        partId:
+          type: string
+        name:
+          type: string
+        print:
+          type: string
+        category:
+          type: string
+        imgUrl:
+          type: string
+        color:
+          type: string
+    PartList:
+      type: object
+      properties:
+        listId:
+          type: integer
+          format: int64
+        name:
+          type: string
+        blueprint:
+          $ref: '#/components/schemas/Blueprint'
+    BlueprintType:
+      type: string
+      enum:
+        - MOC
+        - SET
+    Blueprint:
+      type: object
+      properties:
+        blueprintId:
+          type: integer
+          format: int64
+        theme:
+          type: string
+        name:
+          type: string
+        author:
+          type: string
+        imgUrl:
+          type: string
+        type:
+          $ref: '#/components/schemas/BlueprintType'
+    NewsBlog:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        url:
+          type: string
+        author:
+          type: string
+    ApiResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        type:
+          type: string
+        message:
+          type: string
   securitySchemes:
     bearerAuth:            # arbitrary name for the security scheme
       type: http
       scheme: bearer
       bearerFormat: JWT    # optional, arbitrary value for documentation purposes
-definitions:
-  Account:
-    type: "object"
-    properties:
-      username:
-        type: "string"
-  ResponseToken:
-    type: "object"
-    properties:
-      app_token:
-        type: "string"
-        example: "32okdwkdwkoa2"
-  Part:
-    type: "object"
-    properties:
-      partNumber:
-        type: "integer"
-        format: "int32"
-      partId:
-        type: "string"
-      name:
-        type: "string"
-      print:
-        type: "string"
-      category:
-        type: "string"
-      imgUrl:
-        type: "string"
-      color:
-        type: "string"
-  PartList:
-    type: "object"
-    properties:
-      listId:
-        type: "integer"
-        format: "int64"
-      name:
-        type: "string"
-      blueprint:
-        $ref: '#/definitions/Blueprint'
-  BlueprintType:
-    type: "string"
-    enum:
-      - MOC
-      - SET
-  Blueprint:
-    type: "object"
-    properties:
-      blueprintId:
-        type: "integer"
-        format: "int64"
-      theme:
-        type: "string"
-      name:
-        type: "string"
-      author:
-        type: "string"
-      imgUrl:
-        type: "string"
-      type:
-        $ref: '#/definitions/BlueprintType'
-  NewsBlog:
-    type: "object"
-    properties:
-      id:
-        type: "integer"
-        format: "int64"
-      name:
-        type: "string"
-      url:
-        type: "string"
-      author:
-        type: "string"
-  ApiResponse:
-    type: "object"
-    properties:
-      code:
-        type: "integer"
-        format: "int32"
-      type:
-        type: "string"
-      message:
-        type: "string"
 externalDocs:
   description: "Find out more about Swagger"
   url: "http://swagger.io"
