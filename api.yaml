@@ -8,8 +8,6 @@ info:
     email: "apiteam@swagger.io"
   license:
     name: "private"
-servers:
-  - url: https://forstify.de/api/v2
 tags:
   - name: "partList"
     description: "Everything about your part lists"
