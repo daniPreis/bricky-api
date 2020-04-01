@@ -9,46 +9,32 @@ info:
   license:
     name: "private"
 tags:
-  - name: "partList"
+  - name: "part-list"
     description: "Everything about your part lists"
   - name: "blueprint"
     description: "Everything about blueprints, aka Mocs and Sets"
-  - name: "newsBlog"
+  - name: "news-blog"
     description: "Everything about newsBlog"
-  - name: "user"
-    description: "Operations about user"
+  - name: "account"
+    description: "Operations about accounts"
 paths:
-  /partList:
+
+  /part-list:
     get:
       tags:
-        - "partList"
-      summary: "Receive all PartLists of a user"
-      description: "Receive all PartLists of a user"
+        - "part-list"
+      summary: "Receive all PartLists without blueprint of a user only with id and name"
+      description: "Receive all PartLists without blueprint of a user only with id and name"
+      security: 
+       - bearerAuth: []
       responses:
         200:
           description: "OK, PartLists successfully returned"
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/PartListsResponse'
-  /partList/short:
-    get:
-      tags:
-        - "partList"
-      summary: "Receive all PartLists of a user only with id and name"
-      description: "Receive all PartLists of a user only with id and name"
-      responses:
-        200:
-          description: "OK, PartLists successfully returned"
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/PartListsShortResponse'
-  /partList/{id}:
+                $ref: '#/components/schemas/PartListsResponse'
+  /part-list/{id}:
     get:
       parameters:
         - in: path
@@ -57,10 +43,11 @@ paths:
           required: true
           schema:
             type: string
+            example: "fdjkasdju56g4635r"
       security:
         - bearerAuth: []
       tags:
-        - "partList"
+        - "part-list"
       summary: "Receive Partlist with given Id"
       description: "Receive Partlist with given Id"
       responses:
@@ -72,56 +59,7 @@ paths:
                 $ref: '#/components/schemas/PartList'
         404:
           description: "Partlist not found"
-    put:
-      tags:
-        - "partList"
-      summary: "Update an existing part list"
-      description: "Update an existing part list"
-      parameters:
-        - in: path
-          name: id
-          description: Id of the partList
-          required: true
-          schema:
-            type: string
-      security:
-        - bearerAuth: []
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PartList'
-      responses:
-        200:
-          description: "OK, PartList successfully updated"
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PartList'
-        400:
-          description: "At least one of the body valus is invalid"
-        404:
-          description: "Partlist not found"
-    delete:
-      tags:
-        - "partList"
-      summary: "Delete an existing part list"
-      description: "Delete an existing part list"
-      parameters:
-        - in: path
-          name: id
-          description: Id of the partList
-          required: true
-          schema:
-            type: string
-      security:
-        - bearerAuth: []
-      responses:
-        200:
-          description: "OK, PartList successfully deleted"
-        404:
-          description: "Partlist not found"
-  /partList/{id}/short:
+  /part-list/{id}/parts:
     get:
       parameters:
         - in: path
@@ -130,30 +68,10 @@ paths:
           required: true
           schema:
             type: string
+      security: 
+       - bearerAuth: []
       tags:
-        - "partList"
-      summary: "Receive Partlist with given Id"
-      description: "Receive Partlist with given Id"
-      responses:
-        200:
-          description: "OK, PartList successfully returned"
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ShortPartList'
-        404:
-          description: "Partlist not found"
-  /partList/{id}/parts:
-    get:
-      parameters:
-        - in: path
-          name: id
-          description: Id of the partList
-          required: true
-          schema:
-            type: string
-      tags:
-        - "partList"
+        - "part-list"
       summary: "Receive Parts of the Partlist with given Id"
       description: "Receive Parts of the Partlist with given Id"
       responses:
@@ -167,8 +85,6 @@ paths:
                   $ref: '#/components/schemas/Part'
         404:
           description: "Partlist not found"
-  /account:
-          description: "Order not found"
   /blueprint/saved:
     get:
       security:
@@ -177,7 +93,64 @@ paths:
         - "blueprint"
       summary: "Get all wanted/liked blueprints by the logged in user"
       description: ""
-      operationId: "getSavedBlueprints"
+      responses:
+        200:
+          description: "successful operation"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Blueprint"
+  /blueprint/saved/{blueprintId}:
+    put:
+      security: 
+       - bearerAuth: []
+      tags: 
+       - "blueprint"
+      summary: "Add blueprint to list of wanted/liked blueprints"
+      description: ""
+      parameters: 
+       - name: "blueprintId"
+         in: "path"
+         schema:
+           type: string
+           example: "h57d4ng5f34h"
+         description: "The id of the blueprint"
+         required: true
+      responses:
+        200:
+          description: "successful operation"
+        404:
+          description: "Blueprint not found"
+    delete:
+      security: 
+       - bearerAuth: []
+      tags: 
+       - "blueprint"
+      summary: "Remove blueprint from list of wanted/liked blueprints"
+      description: ""
+      parameters: 
+       - name: "blueprintId"
+         in: "path"
+         schema:
+           type: string
+           example: "h57d4ng5f34h"
+         description: "The id of the blueprint"
+         required: true
+      responses:
+        200:
+          description: "successful operation"
+        404:
+          description: "Blueprint not found"
+  /blueprint/owned:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - "blueprint"
+      summary: "Get all owned blueprints by the logged in user"
+      description: ""
       responses:
         200:
           description: "successful operation"
@@ -189,18 +162,68 @@ paths:
                   $ref: "#/components/schemas/Blueprint"
         404:
           description: "Blueprint not found"
+  /blueprint/owned/{blueprintId}:
+    put:
+      security: 
+       - bearerAuth: []
+      tags: 
+       - "blueprint"
+      summary: "Add blueprint to list of owned blueprints or edit use for build status"
+      description: ""
+      parameters: 
+       - name: "blueprintId"
+         in: "path"
+         schema:
+           type: string
+           example: "h57d4ng5f34h"
+         description: "The id of the blueprint"
+         required: true
+      requestBody:
+        description: "allow part usage in construction"
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                useForBuilding:
+                  type: boolean
+      responses:
+        200:
+          description: "successful operation"
+        404:
+          description: "Blueprint not found"
+    delete:
+      security: 
+       - bearerAuth: []
+      tags: 
+       - "blueprint"
+      summary: "Remove blueprint from list of owned blueprints"
+      description: ""
+      parameters: 
+       - name: "blueprintId"
+         in: "path"
+         schema:
+           type: string
+           example: "h57d4ng5f34h"
+         description: "The id of the blueprint"
+         required: true
+      responses:
+        200:
+          description: "successful operation"
+        404:
+          description: "Blueprint not found"        
   /blueprint/{blueprintId}:
     get:
       tags:
         - "blueprint"
       summary: "Get details of blueprint by Id"
       description: ""
-      operationId: "getBlueprintById"
       parameters:
         - name: "blueprintId"
           in: "path"
           schema:
-            type: "string"
+            type: string
+            example: "h57d4ng5f34h"
           description: "The id of the blueprint"
           required: true
       responses:
@@ -219,7 +242,10 @@ paths:
       summary: "Authorize user account"
       description: "Authenticate with Rebrickable"
       requestBody:
-        $ref: '#/components/requestBodies/LoginCredentials'
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginScheme"
       responses:
         200:
           description: "Ok, JWT Token"
@@ -246,46 +272,17 @@ paths:
         - "account"
       summary: "Logs out current logged in user session"
       description: ""
-      operationId: "logoutUser"
-      parameters: []
       responses:
         200:
           description: "successful operation"
-  /account/{username}:
-    get:
-      security:
-        - bearerAuth: []
-      tags:
-        - "account"
-      summary: "Get account info for logged in user"
-      description: ""
-      operationId: "getAccountByUsername"
-      parameters:
-        - name: "username"
-          in: "path"
-          schema:
-            type: "string"
-          description: "The username of the account you want info of"
-          required: true
-      responses:
-        200:
-          description: "successful operation"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Account"
-        400:
-          description: "Invalid username supplied"
-        404:
-          description: "User not found"
+  /account:
     delete:
       security:
         - bearerAuth: []
       tags:
         - "account"
-      summary: "Delete user"
+      summary: "Delete user from bricky database"
       description: "This can only be done by the logged in user."
-      operationId: "deleteUser"
       parameters:
         - name: "username"
           in: path
@@ -296,18 +293,14 @@ paths:
       responses:
         200:
           description: "User successfully deleted"
-        400:
-          description: "Invalid username supplied"
         404:
           description: "User not found"
-  /newsBlog/availableBlogs:
+  /news-blog/available:
     get:
       tags:
-        - "newsBlog"
+        - "news-blog"
       summary: "Get list of available news blogs"
       description: ""
-      operationId: "getAvailableBlogs"
-      parameters: []
       responses:
         200:
           description: "successful operation"
@@ -315,21 +308,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/NewsBlogList'
-  /newsBlog/subscribedBlogs/{username}:
+  /news-blog/subscribed:
     get:
       tags:
-        - "newsBlog"
+        - "news-blog"
       summary: "Get list of subscribed news blogs"
       description: ""
-      operationId: "getSubscribedBlogs"
-      parameters:
-        - name: "username"
-          in: "path"
-          schema:
-            type: "string"
-          description: "The username of the account you want info of"
-          required: true
-          example: "max_mustermann"
+      security:
+        - bearerAuth: []
       responses:
         200:
           description: "successful operation"
@@ -342,63 +328,45 @@ paths:
         404:
           description: "User not found"
 
-  /newsBlog/subscription/{username}/{blogId}:
+  /news-blog/subscribed/{blogId}:
     put:
       tags:
-        - "newsBlog"
+        - "news-blog"
       summary: "put given Blog to list of subscribed news blogs"
       description: ""
-      operationId: "subscribeBlog"
       parameters:
-        - name: "username"
-          in: "path"
-          schema:
-            type: "string"
-          description: "The username of the account you want to subscribe"
-          required: true
-          example: "max_mustermann"
         - name: "blogId"
           in: "path"
           schema:
-            type: integer
-            format: int64
+            type: string
           description: "The id of the news blog you want to subscribe"
           required: true
-          example: 5
+          example: "jöshg5fg3d4f"
+      security:
+        - bearerAuth: []
       responses:
         200:
           description: "Subscription successfully added"
-        400:
-          description: "Invalid username or blogId supplied"
         404:
           description: "User or NewsBlog not found"
     delete:
       tags:
-        - "newsBlog"
+        - "news-blog"
       summary: "delete given Blog from list of subscribed news blogs"
       description: ""
-      operationId: "unsubscribeBlog"
       parameters:
-        - name: "username"
-          in: "path"
-          schema:
-            type: "string"
-          description: "The username of the account you want to unsubscribe"
-          required: true
-          example: "max_mustermann"
         - name: "blogId"
           in: "path"
           schema:
-            type: integer
-            format: int64
+            type: string
           description: "The id of the news blog you want to unsubscribe"
           required: true
-          example: 5
+          example: "jöshg5fg3d4f"
+      security: 
+       - bearerAuth: []
       responses:
         200:
           description: "Subscription successfully deleted"
-        400:
-          description: "Invalid username or blogId supplied"
         404:
           description: "User or NewsBlog not found"
 components:
@@ -407,46 +375,36 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT    # optional, arbitrary value for documentation purposes
-  requestBodies:
-    LoginCredentials:
-      description: "Login Credentials"
-      required: true
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/LoginScheme'
-          example:
-            username: "Dönermann"
-            password: "Kebab"
+
   schemas:
+    AuthenticationResponse:
+      type: object
+      properties:
+        appToken:
+          type: string
+          example: "klsadöjfdsajföajudsdsf"
+        accountInfo:
+          $ref: '#/components/schemas/Account'
     LoginScheme:
       type: object
       properties:
         username:
-          type: "string"
+          type: string
+          example: "Dönermann"
         password:
-          type: "string"
+          type: string
+          example: "Kebab"
+
     PartListsResponse:
       type: array
-      properties:
-        items:
-          $ref: '#/components/schemas/PartList'
-    PartListsShortResponse:
-      type: array
-      properties:
-        items:
-          $ref: '#/components/schemas/ShortPartList'
+      items:
+        $ref: '#/components/schemas/ShortPartList'
     Account:
       type: "object"
       properties:
         username:
-          type: "string"
-    ResponseToken:
-      type: "object"
-      properties:
-        app_token:
-          type: "string"
-          example: "32okdwkdwkoa2"
+          type: string
+          example: "Dönermann"
     Part:
       type: "object"
       properties:
@@ -454,17 +412,17 @@ components:
           type: "integer"
           format: "int32"
         partId:
-          type: "string"
+          type: string
         name:
-          type: "string"
+          type: string
         print:
-          type: "string"
+          type: string
         category:
-          type: "string"
+          type: string
         imgUrl:
-          type: "string"
+          type: string
         color:
-          type: "string"
+          type: string
       example:
         partNumber: 123
         partId: "1x2 Block"
@@ -481,10 +439,10 @@ components:
           format: "int64"
           example: 12
         name:
-          type: "string"
+          type: string
           example: "My List"
-        blueprint:
-          $ref: '#/components/schemas/Blueprint'
+        useForBuild:
+          type: boolean
         parts:
           type: array
           items:
@@ -497,29 +455,35 @@ components:
           format: "int64"
           example: 12
         name:
-          type: "string"
+          type: string
           example: "My List"
-        blueprint:
-          $ref: '#/components/schemas/Blueprint'
+        useForBuild:
+          type: boolean
     BlueprintType:
-      type: "string"
+      type: string
       enum:
         - MOC
         - SET
+      example: MOC
     Blueprint:
       type: "object"
       properties:
         blueprintId:
           type: "integer"
           format: "int64"
+          example: 2
         theme:
-          type: "string"
+          type: string
+          example: "Creator"
         name:
-          type: "string"
+          type: string
+          example: "Mein erstes Blaupause"
         author:
-          type: "string"
+          type: string
+          example: "dummer Benny"
         imgUrl:
-          type: "string"
+          type: string
+          example: "example.com/exampl.png"
         type:
           $ref: '#/components/schemas/BlueprintType'
     BlueprintWithPartList:
@@ -533,33 +497,21 @@ components:
       type: "object"
       properties:
         id:
-          type: "integer"
-          format: "int64"
+          type: string
+          example: "jöshg5fg3d4f"
         name:
-          type: "string"
+          type: string
+          example: "zusammengebaut"
+        description:
+          type: string
+          example: "LEGO News Blog"
         url:
-          type: "string"
-        author:
-          type: "string"
-      example:
-        id: 1
-        name: zusammengebaut
-        url: https://zusammengebaut.com/
-        author: mehrere
+          type: string
+          example: "https://zusammengebaut.com/feed"
+        language:
+          type: string
+          example: "de-DE"
     NewsBlogList:
-     type: object
-     properties:
-        newsBlogs:
-          type: array
-          items:
-            $ref: '#/components/schemas/NewsBlog'
-    ApiResponse:
-      type: "object"
-      properties:
-        code:
-          type: "integer"
-          format: "int32"
-        type:
-          type: "string"
-        message:
-          type: "string"
+      type: array
+      items:
+        $ref: '#/components/schemas/NewsBlog'
