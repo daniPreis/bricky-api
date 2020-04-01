@@ -18,7 +18,7 @@ tags:
   - name: "user"
     description: "Operations about user"
 paths:
-  "/partList":
+  /partList:
     get:
       tags:
         - "partList"
@@ -33,7 +33,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/PartListsResponse'
-  "/partList/short":
+  /partList/short:
     get:
       tags:
         - "partList"
@@ -48,7 +48,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/PartListsShortResponse'
-  "/partList/{id}":
+  /partList/{id}:
     get:
       parameters:
         - in: path
@@ -121,7 +121,7 @@ paths:
           description: "OK, PartList successfully deleted"
         404:
           description: "Partlist not found"
-  "/partList/{id}/short":
+  /partList/{id}/short:
     get:
       parameters:
         - in: path
@@ -143,7 +143,7 @@ paths:
                 $ref: '#/components/schemas/ShortPartList'
         404:
           description: "Partlist not found"
-  "/partList/{id}/parts":
+  /partList/{id}/parts:
     get:
       parameters:
         - in: path
@@ -168,6 +168,51 @@ paths:
         404:
           description: "Partlist not found"
   /account:
+          description: "Order not found"
+  /blueprint/saved:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - "blueprint"
+      summary: "Get all wanted/liked blueprints by the logged in user"
+      description: ""
+      operationId: "getSavedBlueprints"
+      responses:
+        200:
+          description: "successful operation"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Blueprint"
+        404:
+          description: "Blueprint not found"
+  /blueprint/{blueprintId}:
+    get:
+      tags:
+        - "blueprint"
+      summary: "Get details of blueprint by Id"
+      description: ""
+      operationId: "getBlueprintById"
+      parameters:
+        - name: "blueprintId"
+          in: "path"
+          schema:
+            type: "string"
+          description: "The id of the blueprint"
+          required: true
+      responses:
+        200:
+          description: "successful operation"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BlueprintWithPartList"
+        404:
+          description: "Blueprint not found"
+  /account/login:
     post:
       tags:
         - "account"
@@ -303,6 +348,13 @@ components:
           type: "string"
         type:
           $ref: '#/components/schemas/BlueprintType'
+    BlueprintWithPartList:
+      allOf:
+        - $ref: '#/components/schemas/Blueprint'
+        - type: object
+      properties:
+        partlist:
+          $ref: '#/components/schemas/PartList'
     NewsBlog:
       type: "object"
       properties:
