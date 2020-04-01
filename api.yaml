@@ -342,6 +342,49 @@ paths:
           description: "Invalid ID supplied"
         404:
           description: "Order not found"
+  /blueprint/saved:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - "blueprint"
+      summary: "Get all wanted/liked blueprints by the logged in user"
+      description: ""
+      operationId: "getSavedBlueprints"
+      responses:
+        200:
+          description: "successful operation"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Blueprint"
+        404:
+          description: "Blueprint not found"
+  /blueprint/{blueprintId}:
+    get:
+      tags:
+        - "blueprint"
+      summary: "Get details of blueprint by Id"
+      description: ""
+      operationId: "getBlueprintById"
+      parameters:
+        - name: "blueprintId"
+          in: "path"
+          schema:
+            type: "string"
+          description: "The id of the blueprint"
+          required: true
+      responses:
+        200:
+          description: "successful operation"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BlueprintWithPartList"
+        404:
+          description: "Blueprint not found"
   /account/login:
     post:
       tags:
@@ -522,6 +565,13 @@ components:
           type: string
         type:
           $ref: '#/components/schemas/BlueprintType'
+    BlueprintWithPartList:
+      allOf:
+        - $ref: '#/components/schemas/Blueprint'
+        - type: object
+      properties:
+        partlist:
+          $ref: '#/components/schemas/PartList'
     NewsBlog:
       type: object
       properties:
