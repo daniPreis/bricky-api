@@ -283,13 +283,6 @@ paths:
         - "account"
       summary: "Delete user from bricky database"
       description: "This can only be done by the logged in user."
-      parameters:
-        - name: "username"
-          in: path
-          schema:
-            type: string
-          description: "The username of the account that needs to be deleted (can only be own)"
-          required: true
       responses:
         200:
           description: "User successfully deleted"
