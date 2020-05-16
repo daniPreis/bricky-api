@@ -23,6 +23,9 @@ paths:
     get:
       tags:
         - "part-list"
+      parameters: 
+        - $ref: "#/components/parameters/updateParam"
+          
       summary: "Receive all PartLists without blueprint of a user only with id and name"
       description: "Receive all PartLists without blueprint of a user only with id and name"
       security: 
@@ -34,6 +37,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PartListsResponse'
+
   /part-list/{id}:
     get:
       parameters:
@@ -44,6 +48,7 @@ paths:
           schema:
             type: string
             example: "fdjkasdju56g4635r"
+        - $ref: "#/components/parameters/updateParam"
       security:
         - bearerAuth: []
       tags:
@@ -68,6 +73,7 @@ paths:
           required: true
           schema:
             type: string
+        - $ref: "#/components/parameters/updateParam"
       security: 
        - bearerAuth: []
       tags:
@@ -151,6 +157,8 @@ paths:
         - "blueprint"
       summary: "Get all owned blueprints by the logged in user"
       description: ""
+      parameters: 
+        - $ref: "#/components/parameters/updateParam"
       responses:
         200:
           description: "successful operation"
@@ -288,6 +296,22 @@ paths:
           description: "User successfully deleted"
         404:
           description: "User not found"
+  /news-blog:
+    post:
+      tags: 
+        - "news-blog"
+      summary: "Add new newsblog to list of available blogs"
+      description: ""
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewsBlog'
+      responses:
+        200:
+          description: "Newsblog successfully added"
+        400:
+          description: "Incomplete information provided"
   /news-blog/available:
     get:
       tags:
@@ -363,6 +387,15 @@ paths:
         404:
           description: "User or NewsBlog not found"
 components:
+  parameters:
+    updateParam:
+      in: query
+      name: update
+      description: specifies if data should be updated from rebrickable
+      required: false
+      schema:
+        type: boolean
+        example: true
   securitySchemes:
     bearerAuth:            # arbitrary name for the security scheme
       type: http
